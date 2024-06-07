@@ -16,27 +16,23 @@ optdepends=(
     'libpcap: Networking not limited to TCP/IP'
 )
 options=('!buildflags')
-source=(
-    "${pkgname}_$pkgver.tgz::https://github.com/${_pkgname}/${_pkgname}/archive/refs/tags/v${pkgver}.tar.gz"
-)
-sha512sums=('d1b0a1810f8712464ce8266942e9bfdc9721ab4ac70bbb242b3b06d6a7d6613b7bcb0ba730a2e458b2731c8d58e38c4b245b6f4afb5ee6c11ab4a2fb0dfd6d5e')
 
 build() {
     case "$CARCH" in
-        pentium4) _NDR=off; _TOOLCHAIN=cmake/flags-gcc-i686.cmake ;;
-        x86_64)   _NDR=off; _TOOLCHAIN=cmake/flags-gcc-x86_64.cmake ;;
-        armv7h)    _NDR=on;  _TOOLCHAIN=cmake/flags-gcc-armv7.cmake ;;
-        aarch64)  _NDR=on;  _TOOLCHAIN=cmake/flags-gcc-aarch64.cmake ;;
+        pentium4) _NDR=off; _TOOLCHAIN=$srcdir/cmake/flags-gcc-i686.cmake ;;
+        x86_64)   _NDR=off; _TOOLCHAIN=$srcdir/cmake/flags-gcc-x86_64.cmake ;;
+        armv7h)    _NDR=on;  _TOOLCHAIN=$srcdir/cmake/flags-gcc-armv7.cmake ;;
+        aarch64)  _NDR=on;  _TOOLCHAIN=$srcdir/cmake/flags-gcc-aarch64.cmake ;;
     esac
-    LDFLAGS='-z now' cmake -S"$_pkgname-$pkgver" -Bbuild --preset regular --toolchain "$_TOOLCHAIN" -DCMAKE_INSTALL_PREFIX=/usr -DUSE_QT6=on -DNEW_DYNAREC="$_NDR"
-    cmake --build build
+    LDFLAGS='-z now' cmake -S"$srcdir" -B "${srcdir}/../build" --preset regular --toolchain "$_TOOLCHAIN" -DCMAKE_INSTALL_PREFIX=/usr -DUSE_QT6=on -DNEW_DYNAREC="$_NDR"
+    cmake --build "${srcdir}/../build"
 }
 
 package() {
-    DESTDIR="${pkgdir}" cmake --build "${srcdir}/build" --target install
+    DESTDIR="${pkgdir}" cmake --build "${srcdir}/../build" --target install
     for i in 48x48 64x64 72x72 96x96 128x128 192x192 256x256 512x512; do
-        install -Dm644 "$srcdir/$_pkgname-$pkgver/src/unix/assets/$i/net.86box.86Box.png" -t "$pkgdir/usr/share/icons/hicolor/$i/apps"
+        install -Dm644 "$srcdir/src/unix/assets/$i/net.86box.86Box.png" -t "$pkgdir/usr/share/icons/hicolor/$i/apps"
     done
     mkdir "$pkgdir/usr/share/applications"
-    sed 's/^Exec.*/Exec=86Box -P .local\/share\/86Box/' "$srcdir/$_pkgname-$pkgver/src/unix/assets/net.86box.86Box.desktop" > "$pkgdir/usr/share/applications/net.86box.86Box.desktop"
+    sed 's/^Exec.*/Exec=86Box -P .local\/share\/86Box/' "$srcdir/src/unix/assets/net.86box.86Box.desktop" > "$pkgdir/usr/share/applications/net.86box.86Box.desktop"
 }
