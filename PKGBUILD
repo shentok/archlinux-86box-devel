@@ -24,7 +24,7 @@ build() {
         armv7h)    _NDR=on;  _TOOLCHAIN=$srcdir/cmake/flags-gcc-armv7.cmake ;;
         aarch64)  _NDR=on;  _TOOLCHAIN=$srcdir/cmake/flags-gcc-aarch64.cmake ;;
     esac
-    LDFLAGS='-z now' cmake -S"$srcdir" -B "${srcdir}/../build" --preset regular --toolchain "$_TOOLCHAIN" -DCMAKE_INSTALL_PREFIX=/usr -DUSE_QT6=on -DNEW_DYNAREC="$_NDR"
+    LDFLAGS='-z now' cmake -S"$srcdir" -B "${srcdir}/../build" --preset debug --toolchain "$_TOOLCHAIN" -DCMAKE_INSTALL_PREFIX=/usr -DUSE_QT6=on -DNEW_DYNAREC="$_NDR"
     cmake --build "${srcdir}/../build"
 }
 
